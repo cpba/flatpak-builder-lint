@@ -35,11 +35,6 @@ class MetainfoCheck(Check):
         ):
             return
 
-        if not os.path.exists(icon_path) and appstream.component_type(
-            appstream_path
-        ) in ("desktop", "desktop-application"):
-            self.errors.add("appstream-missing-icon-file")
-
         for metainfo_dir in metainfo_dirs:
             for ext in metainfo_exts:
                 metainfo_dirext = f"{metainfo_dir}/{appid}{ext}"
@@ -74,6 +69,9 @@ class MetainfoCheck(Check):
                         self.appstream.add(err.strip())
                     for out in appinfo_validation["stdout"].splitlines()[1:]:
                         self.appstream.add(re.sub("^\u2022", "", out).strip())
+
+        if not os.path.exists(icon_path):
+            self.errors.add("appstream-missing-icon-file")
 
     def check_build(self, path: str) -> None:
         appid = builddir.infer_appid(path)
